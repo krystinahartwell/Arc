@@ -1,0 +1,12 @@
+#variable for master layer file
+biome = arcpy.mapping.layer(r"C:\......)
+
+for lyr in mapLayers:
+  if lyr.name == "Biomes":  #Biomes is the name of the feature class
+    try:
+      arcpy.mapping.UpdateLayer(df, lyr, biome, True)   #update layer with master layer file
+      lyr.symbology.valueField = "BIOME_DESC"     #BIOME_DESC is the name of the field in the feature class
+      lyr.symbology.addAllValues()             #adds all the values from the feature class based on field value established
+      arcpy.AddMessage(lyr.name + ' symbology set')
+    except:
+      arcpy.AddWarning(lyr.name + 'symbology NOT set')
