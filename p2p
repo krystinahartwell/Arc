@@ -1,0 +1,36 @@
+import arcpy
+
+#get gdb
+arcpy.env.workspace = arcpy.GetParameterAsText(0)
+
+############### calculate distance ###############
+#set variables
+input = "FC NAME"            #existing from
+nearFeat = "FC NAME"         #existing to 
+outTbl = "ptDistance"        #new name of column in attribute table
+  
+#find distance between points
+arcpy.PointDistance_analysis(input, nearFeat, outTbl)
+  
+############### sort the attribute table ###############
+outData = "FC NAME_sort"
+sortFields = ["ptDistance", "ASCENDING"]
+arcpy.Sort_management(input, outData, sortFields)
+
+############### add new field for rank ###############
+fieldName = "rank"
+arcpy.AddField_management(input, fieldName, "SHORT")
+
+############### calculate the ranks ###############
+expression = "autoIncrement()"
+codeblock = """def autoIncrement():
+  rec = 0
+  global rec
+  pStart = 1
+  pInterval = 1
+  if (rec == 0):
+    rec = pStart
+  else:
+    rec += pInterval
+  return rec"""
+arcpy.CalculateField_management(input, fieldName, expression, "PYTHON_9.3", codeblock)
